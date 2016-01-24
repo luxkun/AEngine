@@ -26,9 +26,29 @@ namespace Example
             {
                 Color = new Color4(1f, 0.5f, 0f, 1f),
                 Scale = new Vector3(15f, 15f, 15f),
-                Position = new Vector3(0f, 0f, -20f)
+                Position = new Vector3(40f, 0f, -20f)
             };
-            monkeyMesh.AddHitBox("main", 10f, 2f, 15f);
+            monkeyMesh.AddHitBox("mass", 10f, 10f, 15f);
+
+            var crazyMonkeyMesh = new Mesh((MeshAsset)engine.GetAsset("monkey"))
+            {
+                Color = new Color4(0f, 0.5f, 1f, 0.9f),
+                Scale = new Vector3(15f, 15f, 15f),
+                Position = new Vector3(0f, 2f, -16f)
+            };
+            crazyMonkeyMesh.AddHitBox("mass", 10f, 10f, 15f);
+
+            float speed = -10f;
+            monkeyMesh.OnUpdate += s =>
+            {
+                var sender = (Mesh)s;
+                if (sender.HasCollisions())
+                    Console.WriteLine("collides");
+                else
+                    Console.WriteLine("no collision");
+
+                sender.Position = new Vector3(sender.Position.X + speed * sender.DeltaTime, sender.Position.Y, sender.Position.Z);
+            };
 
             var inputManager = new GameObject();
             inputManager.OnUpdate += (object s) =>
@@ -65,6 +85,7 @@ namespace Example
             };
 
             engine.SpawnObject("monkeyMesh", monkeyMesh);
+            engine.SpawnObject("crazyMonkeyMesh", crazyMonkeyMesh);
             engine.SpawnObject("inputManager", inputManager);
 
             engine.Run();

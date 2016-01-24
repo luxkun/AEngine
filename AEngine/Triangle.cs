@@ -10,13 +10,15 @@ namespace AEngine
     public class Triangle
     {
         public Mesh Owner { get; set; }
+        public bool DrawOnWorkingTexture { get; set; } = true;
+
         private readonly Vector3 va;
         private readonly Vector3 vb;
         private readonly Vector3 vc;
-        private Sprite spriteA;
-        private Sprite spriteB;
-        private Sprite spriteC;
-        private Texture texture;
+        private readonly Sprite spriteA;
+        private readonly Sprite spriteB;
+        private readonly Sprite spriteC;
+        private readonly Texture texture;
         private Color4 color;
 
         public Triangle(Mesh owner, Vector3 va, Vector3 vb, Vector3 vc)
@@ -64,38 +66,40 @@ namespace AEngine
                 .Rotate(camera.Rotation).Project(Owner.Engine, camera.Fov).FromNdc(Owner.Engine);
 
             //Console.WriteLine(point1 + " " + point2 + " " + point3);
+            if (DrawOnWorkingTexture) { 
+                DrawHelper.DrawLine(Owner.Engine.WorkingTexture, point1, point2, Color);
+                DrawHelper.DrawLine(Owner.Engine.WorkingTexture, point2, point3, Color);
+                DrawHelper.DrawLine(Owner.Engine.WorkingTexture, point1, point3, Color);
+            } else { 
+                // A
+                // a -> b
+                spriteA.position = point1;
+                float deltaX = point2.X - point1.X;
+                float deltaY = point2.Y - point1.Y;
+                spriteA.scale = new Vector2(1f, Math.Abs(deltaX) + Math.Abs(deltaY));
+                spriteA.Rotation = (float)(Math.Atan2(deltaY, deltaX) * 180f / Math.PI);
+                spriteA.DrawTexture(texture);
 
-            DrawHelper.DrawLine(Owner.Engine.WorkingTexture, point1, point2, Color);
-            DrawHelper.DrawLine(Owner.Engine.WorkingTexture, point2, point3, Color);
-            DrawHelper.DrawLine(Owner.Engine.WorkingTexture, point1, point3, Color);
+                // B
+                // b -> c
+                spriteB.position = point2;
+                deltaX = point3.X - point2.X;
+                deltaY = point3.Y - point2.Y;
+                spriteB.scale = new Vector2(1f, Math.Abs(deltaX) + Math.Abs(deltaY));
+                spriteB.Rotation = (float)(Math.Atan2(deltaY, deltaX) * 180f / Math.PI);
+                spriteB.DrawTexture(texture);
 
-            //// A
-            //// a -> b
-            //spriteA.position = point1;
-            //float deltaX = point2.X - point1.X;
-            //float deltaY = point2.Y - point1.Y;
-            //spriteA.scale = new Vector2(1f, Math.Abs(deltaX) + Math.Abs(deltaY));
-            //spriteA.Rotation = (float) (Math.Atan2(deltaY, deltaX) * 180f / Math.PI);
-            //spriteA.DrawTexture(texture);
-
-            //// B
-            //// b -> c
-            //spriteB.position = point2;
-            //deltaX = point3.X - point2.X;
-            //deltaY = point3.Y - point2.Y;
-            //spriteB.scale = new Vector2(1f, Math.Abs(deltaX) + Math.Abs(deltaY));
-            //spriteB.Rotation = (float) (Math.Atan2(deltaY, deltaX) * 180f / Math.PI);
-            //spriteB.DrawTexture(texture);
-
-            //// C
-            //// c - > a
-            //spriteC.position = point1;
-            //deltaX = point3.X - point1.X;
-            //deltaY = point3.Y - point1.Y;
-            //spriteC.scale = new Vector2(1f, Math.Abs(deltaX) + Math.Abs(deltaY));
-            //spriteC.Rotation = (float) (Math.Atan2(deltaY, deltaX) * 180f / Math.PI);
-            //spriteC.DrawTexture(texture);
+                // C
+                // c - > a
+                spriteC.position = point1;
+                deltaX = point3.X - point1.X;
+                deltaY = point3.Y - point1.Y;
+                spriteC.scale = new Vector2(1f, Math.Abs(deltaX) + Math.Abs(deltaY));
+                spriteC.Rotation = (float)(Math.Atan2(deltaY, deltaX) * 180f / Math.PI);
+                spriteC.DrawTexture(texture);
+            }
         }
+
 
         public Triangle Clone()
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AEngine;
+using AEngine.Shapes;
 using Aiv.Fast2D;
 using Aiv.Vorbis;
 using OpenTK;
@@ -120,6 +121,27 @@ namespace AEngine
             HitBoxes[name] = hbox;
         }
 
+        public bool HasCollisions()
+        {
+            if (HitBoxes == null) return false;
+            foreach (var obj in Engine.Objects.Values)
+            {
+                if (!obj.Enabled || obj == this || obj.HitBoxes == null)
+                    continue;
+                foreach (var hitBox in HitBoxes.Values)
+                {
+                    foreach (var otherHitBox in obj.HitBoxes.Values)
+                    {
+                        if (hitBox.CollideWith(otherHitBox as Cuboid))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
         // check with all objects
         public List<Collision> CheckCollisions()
         {
@@ -227,22 +249,6 @@ namespace AEngine
             public new HitBox Clone()
             {
                 return new HitBox(Name, Length, Depth, Height, Owner);
-            }
-
-            public bool CollideWith(HitBox other)
-            {
-                //var x1 = (int)(Owner.DrawX + X);
-                //var y1 = (int)(Owner.DrawY + Y);
-                //var x2 = (int)(other.Owner.DrawX + other.X);
-                //var y2 = (int)(other.Owner.DrawY + other.Y);
-                //// simple rectangle collision check
-                //if (x1 + Width >= x2 &&
-                //    x1 <= x2 + other.Width &&
-                //    y1 + Height >= y2 &&
-                //    y1 <= y2 + other.Height)
-                //    return true;
-                //// no collision
-                return false;
             }
         }
 

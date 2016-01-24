@@ -67,7 +67,7 @@
     <Compile Include="Asset.cs" />
     <Compile Include="AudioAsset.cs" />
     <Compile Include="Camera.cs" />
-    <Compile Include="Cuboid.cs" />
+    <Compile Include="Shapes\Cuboid.cs" />
     <Compile Include="DrawHelper.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="GameObject.cs" />
