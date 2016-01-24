@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Aiv.Fast2D;
 using Aiv.Vorbis;
+using OpenTK.Graphics;
 
 namespace AEngine
 {
@@ -102,6 +103,7 @@ namespace AEngine
 
             OnBeforeUpdate?.Invoke(this);
 
+            DrawHelper.ChangeTextureColor(WorkingTexture, BackgroundColor);
             foreach (var obj in SortedObjects)
             {
                 obj.UnchangedTime = UnchangedTime;
@@ -115,7 +117,7 @@ namespace AEngine
                 {
                     foreach (var hitBox in obj.HitBoxes.Values)
                     {
-                        hitBox.Cuboid.Draw(Camera);
+                        hitBox.Draw(Camera);
                     }
                 }
             }
@@ -147,6 +149,8 @@ namespace AEngine
                 }
             }
         }
+
+        public Color4 BackgroundColor { get; set; } = Color4.Black;
 
 
         protected void Initialize()

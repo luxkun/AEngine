@@ -4,6 +4,7 @@ using AEngine;
 using Aiv.Fast2D;
 using Aiv.Vorbis;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace AEngine
 {
@@ -12,12 +13,6 @@ namespace AEngine
         public delegate void AfterUpdateEventHandler(object sender);
 
         public delegate void BeforeUpdateEventHandler(object sender);
-
-        /*
-		 * 
-		 * events management
-		 * 
-		 */
 
         public delegate void DestroyEventHandler(object sender);
 
@@ -76,7 +71,7 @@ namespace AEngine
             set { audioSource = value; }
         }
 
-        public Engine Engine { get; internal set; }
+        public virtual Engine Engine { get; internal set; }
 
         public Dictionary<string, HitBox> HitBoxes { get; private set; }
 
@@ -105,6 +100,7 @@ namespace AEngine
         public virtual Vector3 Position { get; set; }
 
         public virtual Vector3 Scale { get; set; } = Vector3.One;
+        public virtual Vector3 Rotation { get; set; } = Vector3.Zero;
 
         public event AfterUpdateEventHandler OnAfterUpdate;
         public event BeforeUpdateEventHandler OnBeforeUpdate;
@@ -207,17 +203,30 @@ namespace AEngine
         {
             public GameObject Owner { get; set; }
 
+            public override Engine Engine => Owner.Engine;
+
+            public override Vector3 Position
+            {
+                get { return base.Position + Owner.Position; }
+                set { base.Position = value; }
+            }
+
+            public override Vector3 Rotation
+            {
+                get { return base.Rotation + Owner.Rotation; }
+                set { base.Rotation = value; }
+            }
+
             public HitBox(string name, float length, float depth, float height, GameObject owner) : base(length, depth, height)
             {
                 Name = name;
                 Owner = owner;
+                Color = Color4.Green;
             }
-
-            public Cuboid Cuboid { get; set; }
 
             public new HitBox Clone()
             {
-                return new HitBox(Name, Cuboid.Length, Cuboid.Depth, Cuboid.Height, Owner);
+                return new HitBox(Name, Length, Depth, Height, Owner);
             }
 
             public bool CollideWith(HitBox other)

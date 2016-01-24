@@ -63,6 +63,8 @@ namespace AEngine
             var point3 = ((vc * Scale).Rotate(Rotation) + Position + camera.Position)
                 .Rotate(camera.Rotation).Project(Owner.Engine, camera.Fov).FromNdc(Owner.Engine);
 
+            //Console.WriteLine(point1 + " " + point2 + " " + point3);
+
             DrawHelper.DrawLine(Owner.Engine.WorkingTexture, point1, point2, Color);
             DrawHelper.DrawLine(Owner.Engine.WorkingTexture, point2, point3, Color);
             DrawHelper.DrawLine(Owner.Engine.WorkingTexture, point1, point3, Color);

@@ -26,9 +26,7 @@ namespace AEngine
             meshAsset.LoadInto(this);
         }
 
-        public Vector3 Rotation { get; set; } = Vector3.Zero;
-
-        public Color4 Color { get; set; }
+        public virtual Color4 Color { get; set; }
 
         public override void Draw(Camera camera)
         {
