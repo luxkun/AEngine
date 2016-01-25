@@ -4,28 +4,27 @@ namespace AEngine.Shapes
 {
     public class Cuboid : Mesh
     {
-        public readonly float Length;
-        public readonly float Depth;
-        public readonly float Height;
+        //public Vector3 Max => new Vector3(Position.X + Length, Position.Y + Height, Position.Z + Depth);
 
-        public Vector3 Max => new Vector3(Position.X + Length, Position.Y + Height, Position.Z + Depth);
-
-        public Cuboid(float length, float depth, float height) : base()
+        public Cuboid(Vector3 min, Vector3 max) : base()
         {
-            Initialize(length, depth, height);
-            this.Length = length;
-            this.Depth = depth;
-            this.Height = height;
+            Min = min;
+            Max = max;
+            CreateTriangles();
         }
+
+        public Vector3 Max { get; }
+
+        public Vector3 Min { get; }
 
         public bool CollideWith(Cuboid other)
         {
             //return !(Max.X < other.Position.X || Max.Y < other.Position.Y || Max.Z < other.Position.Z ||
             //         Position.X > other.Max.X || Position.Y > other.Max.Y || Position.Z > other.Max.Z);
-            var min1 = Position;
-            var min2 = other.Position;
-            var max1 = Max;
-            var max2 = other.Max;
+            var min1 = Min + Position;
+            var min2 = other.Min + other.Position;
+            var max1 = Max + Position;
+            var max2 = other.Max + other.Position;
             return ((min1.X <= min2.X && min2.X <= max1.X) || (min2.X <= min1.X && min1.X <= max2.X)) &&
                    ((min1.Y <= min2.Y && min2.Y <= max1.Y) || (min2.Y <= min1.Y && min1.Y <= max2.Y)) &&
                    ((min1.Z <= min2.Z && min2.Z <= max1.Z) || (min2.Z <= min1.Z && min1.Z <= max2.Z));
@@ -36,37 +35,34 @@ namespace AEngine.Shapes
             //)
         }
 
-        private void Initialize(float length, float depth, float height)
+        private void CreateTriangles()
         {
-            var A = Vector3.Zero;
             // face 1
-            var a = new Vector3(A.X, A.Y, A.Z);
-            var b = new Vector3(a.X + length, a.Y, a.Z);
-            var c = new Vector3(a.X, a.Y + height, a.Z);
-            var d = new Vector3(b.X, c.Y, a.Z);
+            var a = new Vector3(Min.X, Min.Y, Min.Z);
+            var b = new Vector3(Max.X, Min.Y, Min.Y);
+            var c = new Vector3(Min.X, Max.Y, Min.Y);
+            var d = new Vector3(Max.X, Max.X, Min.Z);
             TriangleList.Add(new Triangle(this, a, b, d));
             TriangleList.Add(new Triangle(this, a, d, c));
 
             // lateral 1
             // same a, c
-            b = new Vector3(A.X, A.Y, A.Z + depth);
-            d = new Vector3(A.X, c.Y, b.Z);
+            b = new Vector3(Min.X, Min.Y, Max.Z);
+            d = new Vector3(Min.X, Max.Y, Max.Z);
             TriangleList.Add(new Triangle(this, a, b, d));
             TriangleList.Add(new Triangle(this, a, d, c));
 
             // lateral 2
-            a = new Vector3(A.X + length, A.Y, A.Z);
-            b = new Vector3(A.X, A.Y, A.Z + depth);
-            c = new Vector3(A.X, A.Y + height, A.Z);
-            d = new Vector3(A.X, c.Y, b.Z);
+            a = new Vector3(Max.X, Min.Y, Min.Z);
+            b = new Vector3(Max.X, Min.Y, Max.Z);
+            c = new Vector3(Max.X, Max.Y, Min.Z);
+            d = new Vector3(Max.X, Max.Y, Max.Z);
             TriangleList.Add(new Triangle(this, a, b, d));
             TriangleList.Add(new Triangle(this, a, d, c));
 
             // face 2
-            a = new Vector3(A.X, A.Y, A.Z + depth);
-            b = new Vector3(a.X + length, a.Y, a.Z);
-            c = new Vector3(a.X, a.Y + height, a.Z);
-            d = new Vector3(b.X, c.Y, a.Z);
+            a = new Vector3(Min.X, Min.Y, Max.Z);
+            c = new Vector3(Min.X, Max.Y, Max.Z);
             TriangleList.Add(new Triangle(this, a, b, d));
             TriangleList.Add(new Triangle(this, a, d, c));
         }

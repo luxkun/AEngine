@@ -28,7 +28,7 @@ namespace Example
                 Scale = new Vector3(15f, 15f, 15f),
                 Position = new Vector3(40f, 0f, -20f)
             };
-            monkeyMesh.AddHitBox("mass", 10f, 10f, 15f);
+            monkeyMesh.AddHitBox("mass", Vector3.Zero, new Vector3(10f, 10f, 15f));
 
             var crazyMonkeyMesh = new Mesh((MeshAsset)engine.GetAsset("monkey"))
             {
@@ -36,7 +36,7 @@ namespace Example
                 Scale = new Vector3(15f, 15f, 15f),
                 Position = new Vector3(0f, 2f, -16f)
             };
-            crazyMonkeyMesh.AddHitBox("mass", 10f, 10f, 15f);
+            crazyMonkeyMesh.AddHitBox("mass", Vector3.Zero, new Vector3(10f, 10f, 15f));
 
             float speed = -10f;
             monkeyMesh.OnUpdate += s =>

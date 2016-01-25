@@ -53,10 +53,11 @@ namespace AEngine
 
         public static void DrawLine(Texture texture, Vector2 from, Vector2 to, Color4 color)
         {
+            var near = 100f;
             // not entirely correct but quite fast
-            if (from.X < 0 || to.X < 0 || from.Y < 0 || to.X < 0 || from.X > texture.Width ||
-                to.X > texture.Width ||
-                from.Y > texture.Height || to.Y > texture.Height)
+            if (from.X < near || to.X < near || from.Y < near || to.X < near ||
+                from.X > texture.Width + near || to.X > texture.Width + near ||
+                from.Y > texture.Height + near || to.Y > texture.Height + near)
                 return;
             var x = (int)from.X;
             var y = (int)from.Y;

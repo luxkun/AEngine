@@ -54,12 +54,14 @@ namespace AEngine
             return v;
         }
 
-        public static Vector2 Project(this Vector3 v, Engine engine, float fov)
+        public static Vector2 Project(this Vector3 v, Engine engine, float fov, bool prospective = true)
         {
             var aratio = (float)engine.Width / engine.Height;
             var rad = fov / 2 * ((float)Math.PI / 180); // angles to radians
-            var vy = v.Y / ((float)Math.Tan(rad) * v.Z);
-            var vX = v.X / ((float)Math.Tan(rad) * v.Z * aratio);
+            // TODO: non-prospective projection
+            var tan = (prospective ? (float) Math.Tan(rad) : 1f);
+            var vy = v.Y / (tan * v.Z);
+            var vX = v.X / (tan * v.Z * aratio);
             return new Vector2(vX, vy);
         }
     }

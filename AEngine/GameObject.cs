@@ -111,13 +111,13 @@ namespace AEngine
         public event StartEventHandler OnStart;
         public event UpdateEventHandler OnUpdate;
 
-        public void AddHitBox(string name, float length, float depth, float height)
+        public void AddHitBox(string name, Vector3 min, Vector3 max)
         {
             if (HitBoxes == null)
             {
                 HitBoxes = new Dictionary<string, HitBox>();
             }
-            var hbox = new HitBox(name, length, depth, height, this);
+            var hbox = new HitBox(name, min, max, this);
             HitBoxes[name] = hbox;
         }
 
@@ -239,7 +239,7 @@ namespace AEngine
                 set { base.Rotation = value; }
             }
 
-            public HitBox(string name, float length, float depth, float height, GameObject owner) : base(length, depth, height)
+            public HitBox(string name, Vector3 min, Vector3 max, GameObject owner) : base(min, max)
             {
                 Name = name;
                 Owner = owner;
@@ -248,7 +248,7 @@ namespace AEngine
 
             public new HitBox Clone()
             {
-                return new HitBox(Name, Length, Depth, Height, Owner);
+                return new HitBox(Name, Min, Max, Owner);
             }
         }
 
