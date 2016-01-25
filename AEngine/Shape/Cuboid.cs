@@ -39,15 +39,16 @@ namespace AEngine.Shapes
         {
             // face 1
             var a = new Vector3(Min.X, Min.Y, Min.Z);
-            var b = new Vector3(Max.X, Min.Y, Min.Y);
-            var c = new Vector3(Min.X, Max.Y, Min.Y);
-            var d = new Vector3(Max.X, Max.X, Min.Z);
+            var b = new Vector3(Max.X, Min.Y, Min.Z);
+            var c = new Vector3(Min.X, Max.Y, Min.Z);
+            var d = new Vector3(Max.X, Max.Y, Min.Z);
             TriangleList.Add(new Triangle(this, a, b, d));
             TriangleList.Add(new Triangle(this, a, d, c));
 
             // lateral 1
-            // same a, c
+            a = new Vector3(Min.X, Min.Y, Min.Z);
             b = new Vector3(Min.X, Min.Y, Max.Z);
+            c = new Vector3(Min.X, Max.Y, Min.Z);
             d = new Vector3(Min.X, Max.Y, Max.Z);
             TriangleList.Add(new Triangle(this, a, b, d));
             TriangleList.Add(new Triangle(this, a, d, c));
@@ -62,7 +63,9 @@ namespace AEngine.Shapes
 
             // face 2
             a = new Vector3(Min.X, Min.Y, Max.Z);
+            b = new Vector3(Max.X, Min.Y, Max.Z);
             c = new Vector3(Min.X, Max.Y, Max.Z);
+            d = new Vector3(Max.X, Max.Y, Max.Z);
             TriangleList.Add(new Triangle(this, a, b, d));
             TriangleList.Add(new Triangle(this, a, d, c));
         }

@@ -51,7 +51,7 @@ namespace Example
             };
 
             var inputManager = new GameObject();
-            inputManager.OnUpdate += (object s) =>
+            inputManager.OnUpdate += s =>
             {
                 var sender = (GameObject) s;
                 float xM = 0;
@@ -70,16 +70,16 @@ namespace Example
                 if (sender.Engine.IsKeyDown(KeyCode.F))
                     zM += 1f;
                 var camera = sender.Engine.Camera;
-                float M = 20f*sender.DeltaTime;
+                var m = 20f*sender.DeltaTime;
                 camera.Position = new Vector3(
-                    camera.Position.X + xM * M, camera.Position.Y + yM * M, camera.Position.Z + zM * M);
+                    camera.Position.X + xM * m, camera.Position.Y + yM * m, camera.Position.Z + zM * m);
 
-                float rotationModX =
-                    (sender.Engine.MouseX - sender.Engine.Width/2f)/sender.Engine.Width/2f;
-                rotationModX = (float) (sender.DeltaTime*rotationModX);
-                float rotationModY =
-                    (sender.Engine.MouseY - sender.Engine.Height/2f)/sender.Engine.Height/2f;
-                rotationModY = (float) (sender.DeltaTime*rotationModY);
+                var rotationModX =
+                    (sender.Engine.MouseX - sender.Engine.Width / 2f) / sender.Engine.Width / 2f;
+                rotationModX = sender.DeltaTime * rotationModX;
+                var rotationModY =
+                    (sender.Engine.MouseY - sender.Engine.Height / 2f) / sender.Engine.Height / 2f;
+                rotationModY = sender.DeltaTime * rotationModY;
                 camera.Rotation = new Vector3(
                     camera.Rotation.X + rotationModX, camera.Rotation.Y + rotationModY, camera.Rotation.Z);
             };

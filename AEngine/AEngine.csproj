@@ -64,19 +64,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Asset.cs" />
-    <Compile Include="AudioAsset.cs" />
-    <Compile Include="Camera.cs" />
-    <Compile Include="Shapes\Cuboid.cs" />
-    <Compile Include="DrawHelper.cs" />
+    <Compile Include="Asset\Asset.cs" />
+    <Compile Include="Asset\AudioAsset.cs" />
+    <Compile Include="Object\Camera.cs" />
+    <Compile Include="Shape\Cuboid.cs" />
+    <Compile Include="Helper\DrawHelper.cs" />
     <Compile Include="Engine.cs" />
-    <Compile Include="GameObject.cs" />
-    <Compile Include="Mesh.cs" />
-    <Compile Include="MeshAsset.cs" />
+    <Compile Include="Object\GameObject.cs" />
+    <Compile Include="Object\Mesh.cs" />
+    <Compile Include="Asset\MeshAsset.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TimerManager.cs" />
-    <Compile Include="Triangle.cs" />
-    <Compile Include="VectorExtender.cs" />
+    <Compile Include="Helper\TimerManager.cs" />
+    <Compile Include="Object\Triangle.cs" />
+    <Compile Include="Helper\VectorExtender.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

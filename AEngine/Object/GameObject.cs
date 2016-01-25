@@ -121,7 +121,7 @@ namespace AEngine
             HitBoxes[name] = hbox;
         }
 
-        public bool HasCollisions()
+        public bool HasCollisions(Func<GameObject, HitBox, bool> predicate = null)
         {
             if (HitBoxes == null) return false;
             foreach (var obj in Engine.Objects.Values)
@@ -132,7 +132,7 @@ namespace AEngine
                 {
                     foreach (var otherHitBox in obj.HitBoxes.Values)
                     {
-                        if (hitBox.CollideWith(otherHitBox as Cuboid))
+                        if ((predicate == null || predicate(obj, hitBox)) && hitBox.CollideWith(otherHitBox as Cuboid))
                         {
                             return true;
                         }
@@ -165,7 +165,7 @@ namespace AEngine
                     {
                         if (hitBox.CollideWith(otherHitBox))
                         {
-                            var collision = new Collision(hitBox.Name, obj, otherHitBox.Name);
+                            var collision = new Collision(hitBox, obj, otherHitBox);
                             collisions.Add(collision);
                         }
                     }
@@ -254,16 +254,16 @@ namespace AEngine
 
         public class Collision
         {
-            public Collision(string hitBoxName, GameObject other, string otherHitBoxName)
+            public Collision(HitBox hitBox, GameObject other, HitBox otherHitBox)
             {
-                HitBox = hitBoxName;
+                HitBox = hitBox;
                 Other = other;
-                OtherHitBox = otherHitBoxName;
+                OtherHitBox = otherHitBox;
             }
 
-            public string HitBox { get; private set; }
+            public HitBox HitBox { get; private set; }
             public GameObject Other { get; private set; }
-            public string OtherHitBox { get; private set; }
+            public HitBox OtherHitBox { get; private set; }
         }
     }
 

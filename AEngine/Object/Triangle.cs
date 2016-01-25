@@ -59,11 +59,11 @@ namespace AEngine
         public void Draw(Camera camera)
         {
             var point1 = ((va * Scale).Rotate(Rotation) + Position + camera.Position)
-                .Rotate(camera.Rotation).Project(Owner.Engine, camera.Fov).FromNdc(Owner.Engine);
+                .Rotate(camera.Rotation).Project(Owner.Engine, camera).FromNdc(Owner.Engine);
             var point2 = ((vb * Scale).Rotate(Rotation) + Position + camera.Position)
-                .Rotate(camera.Rotation).Project(Owner.Engine, camera.Fov).FromNdc(Owner.Engine);
+                .Rotate(camera.Rotation).Project(Owner.Engine, camera).FromNdc(Owner.Engine);
             var point3 = ((vc * Scale).Rotate(Rotation) + Position + camera.Position)
-                .Rotate(camera.Rotation).Project(Owner.Engine, camera.Fov).FromNdc(Owner.Engine);
+                .Rotate(camera.Rotation).Project(Owner.Engine, camera).FromNdc(Owner.Engine);
 
             //Console.WriteLine(point1 + " " + point2 + " " + point3);
             if (DrawOnWorkingTexture) { 

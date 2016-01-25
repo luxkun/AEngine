@@ -7,5 +7,11 @@ namespace AEngine
         public float Fov { get; set; } = 60f;
         public Vector3 Position { get; set; }
         public Vector3 Rotation { get; set; }
+        public ProjectionType Type { get; set; } = ProjectionType.Prospective;
+
+        public enum ProjectionType
+        {
+            Prospective, Orthographic
+        }
     }
 }

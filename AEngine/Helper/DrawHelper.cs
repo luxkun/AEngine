@@ -41,6 +41,8 @@ namespace AEngine
 
         public static void PutPixel(Texture texture, int x, int y, Color4 color)
         {
+            if (x < 0 || y < 0 || x >= texture.Width || y >= texture.Height)
+                return;
             var position = y * texture.Width * 4 + x * 4;
             if (position + 3 < texture.Bitmap.Length && position >= 0)
             {
@@ -53,9 +55,9 @@ namespace AEngine
 
         public static void DrawLine(Texture texture, Vector2 from, Vector2 to, Color4 color)
         {
-            var near = 100f;
+            var near = 300f;
             // not entirely correct but quite fast
-            if (from.X < near || to.X < near || from.Y < near || to.X < near ||
+            if (from.X < -near || to.X < -near || from.Y < -near || to.X < -near ||
                 from.X > texture.Width + near || to.X > texture.Width + near ||
                 from.Y > texture.Height + near || to.Y > texture.Height + near)
                 return;
@@ -83,7 +85,7 @@ namespace AEngine
                 dx2 = 0;
             }
             var numerator = longest >> 1;
-            for (var i = 0; i <= longest; i++)
+            for (var i = 0; i <= longest && (x < texture.Width || y < texture.Height); i++)
             {
                 PutPixel(texture, x, y, color);
                 numerator += shortest;

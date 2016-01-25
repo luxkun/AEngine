@@ -4,6 +4,7 @@ using System.Linq;
 using AEngine.Shapes;
 using Aiv.Fast2D;
 using Aiv.Vorbis;
+using OpenTK;
 using OpenTK.Graphics;
 
 namespace AEngine
@@ -175,7 +176,12 @@ namespace AEngine
             Timer = new TimerManager(this);
 
             WorkingTexture = new Texture(Width, Height);
-            WorkingSprite = new Sprite(Width, Height);
+            WorkingSprite = new Sprite(Width, Height)
+            {
+                Rotation = (float)Math.PI, 
+                pivot = new Vector2(Width / 2f, Height / 2f)
+            };
+            WorkingSprite.position = WorkingSprite.pivot;
         }
 
 
