@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using Aiv.Fast2D;
-using OpenTK;
+using System.Numerics;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 
@@ -10,96 +10,151 @@ namespace AEngine
     public class Triangle
     {
         public Mesh Owner { get; set; }
-        public bool DrawOnWorkingTexture { get; set; } = true;
 
-        private readonly Vector3 va;
-        private readonly Vector3 vb;
-        private readonly Vector3 vc;
-        private readonly Sprite spriteA;
-        private readonly Sprite spriteB;
-        private readonly Sprite spriteC;
-        private readonly Texture texture;
-        private Color4 color;
+        private readonly Vertex3 va;
+        private readonly Vertex3 vb;
+        private readonly Vertex3 vc;
 
-        public Triangle(Mesh owner, Vector3 va, Vector3 vb, Vector3 vc)
+        public Triangle(Mesh owner, Vertex3 va, Vertex3 vb, Vertex3 vc)
         {
-            this.Owner = owner;
+            Owner = owner;
             this.va = va;
             this.vb = vb;
             this.vc = vc;
-            this.texture = new Texture(1, 1);
-            // a -> b
-            this.spriteA = new Sprite(1, 1);
-            // b -> c
-            this.spriteB = new Sprite(1, 1);
-            // c - > a
-            this.spriteC = new Sprite(1, 1);
         }
 
         public Vector3 Scale { get; set; } = new Vector3(1f, 1f, 1f);
         public Vector3 Position { get; set; } = Vector3.Zero;
         public Vector3 Rotation { get; set; } = Vector3.Zero;
 
-        public Color4 Color
+        public Color4 Color { get; set; }
+
+        private Color4 TextureMap(Vector2 uv)
         {
-            get { return color; }
-            set
-            {
-                if (value != color) { 
-                    texture.Bitmap[0] = (byte)(value.R * 255);
-                    texture.Bitmap[1] = (byte)(value.G * 255);
-                    texture.Bitmap[2] = (byte)(value.B * 255);
-                    texture.Bitmap[3] = (byte)(value.A * 255);
-                    texture.Update();
-                }
-                color = value;
-            }
+            int x = (int)Math.Abs(uv.X * Owner.Texture.Width) % Owner.Texture.Width;
+            int y = (int)Math.Abs(uv.Y * Owner.Texture.Height) % Owner.Texture.Height;
+            int pos = (int) ((y*Owner.Texture.Width*4) + (x* 4));
+            return new Color4(
+                Owner.Texture.Bitmap[pos] * 0.00392156862f,
+                Owner.Texture.Bitmap[pos + 1] * 0.00392156862f,
+                Owner.Texture.Bitmap[pos + 2] * 0.00392156862f,
+                Owner.Texture.Bitmap[pos + 3] * 0.00392156862f);
         }
 
         public void Draw(Camera camera)
         {
-            var point1 = ((va * Scale).Rotate(Rotation) + Position + camera.Position)
-                .Rotate(camera.Rotation).Project(Owner.Engine, camera).FromNdc(Owner.Engine);
-            var point2 = ((vb * Scale).Rotate(Rotation) + Position + camera.Position)
-                .Rotate(camera.Rotation).Project(Owner.Engine, camera).FromNdc(Owner.Engine);
-            var point3 = ((vc * Scale).Rotate(Rotation) + Position + camera.Position)
-                .Rotate(camera.Rotation).Project(Owner.Engine, camera).FromNdc(Owner.Engine);
+            var point1 = ((va.Position * Scale).Rotate(Rotation) + Position + camera.Position).Rotate(camera.Rotation).Project(Owner.Engine, camera).FromNdc(Owner.Engine);
+            var point2 = ((vb.Position * Scale).Rotate(Rotation) + Position + camera.Position).Rotate(camera.Rotation).Project(Owner.Engine, camera).FromNdc(Owner.Engine);
+            var point3 = ((vc.Position * Scale).Rotate(Rotation) + Position + camera.Position).Rotate(camera.Rotation).Project(Owner.Engine, camera).FromNdc(Owner.Engine);
+            var vertex1 = new Vertex3(point1, va.Uv);
+            var vertex2 = new Vertex3(point2, vb.Uv);
+            var vertex3 = new Vertex3(point3, vc.Uv);
 
-            //Console.WriteLine(point1 + " " + point2 + " " + point3);
-            if (DrawOnWorkingTexture) { 
-                DrawHelper.DrawLine(Owner.Engine.WorkingTexture, point1, point2, Color);
-                DrawHelper.DrawLine(Owner.Engine.WorkingTexture, point2, point3, Color);
-                DrawHelper.DrawLine(Owner.Engine.WorkingTexture, point1, point3, Color);
-            } else { 
-                // A
-                // a -> b
-                spriteA.position = point1;
-                float deltaX = point2.X - point1.X;
-                float deltaY = point2.Y - point1.Y;
-                spriteA.scale = new Vector2(1f, Math.Abs(deltaX) + Math.Abs(deltaY));
-                spriteA.Rotation = (float)(Math.Atan2(deltaY, deltaX) * 180f / Math.PI);
-                spriteA.DrawTexture(texture);
+            DrawTriangleScanLines(vertex1, vertex2, vertex3);
+        }
 
-                // B
-                // b -> c
-                spriteB.position = point2;
-                deltaX = point3.X - point2.X;
-                deltaY = point3.Y - point2.Y;
-                spriteB.scale = new Vector2(1f, Math.Abs(deltaX) + Math.Abs(deltaY));
-                spriteB.Rotation = (float)(Math.Atan2(deltaY, deltaX) * 180f / Math.PI);
-                spriteB.DrawTexture(texture);
+        private void DrawScanline(int y, Vertex3 left1, Vertex3 left2, Vertex3 right1, Vertex3 right2)
+        {
+            float deltaL = 1f;
+            float deltaR = 1f;
+            if (left1.Y != left2.Y)
+            {
+                deltaL = (y - left1.Y)/(left2.Y - left1.Y);
+            }
+            if (right1.Y != right2.Y)
+            {
+                deltaR = (y - right1.Y) / (right2.Y - right1.Y);
+            }
 
-                // C
-                // c - > a
-                spriteC.position = point1;
-                deltaX = point3.X - point1.X;
-                deltaY = point3.Y - point1.Y;
-                spriteC.scale = new Vector2(1f, Math.Abs(deltaX) + Math.Abs(deltaY));
-                spriteC.Rotation = (float)(Math.Atan2(deltaY, deltaX) * 180f / Math.PI);
-                spriteC.DrawTexture(texture);
+            int left = (int) left1.X.Lerp(left2.X, deltaL);
+            int right = (int) right1.X.Lerp(right2.X, deltaR);
+            float zLeft = left1.Z.Lerp(left2.Z, deltaL);
+            float zRight = right1.Z.Lerp(right2.Z, deltaR);
+            Vector2 uStart = Vector2.One;
+            Vector2 uEnd = Vector2.One;
+            if (left1.Uv != Vector2.Zero) { 
+                uStart = left1.Uv.Lerp(left2.Uv, deltaL);
+                uEnd = right1.Uv.Lerp(right2.Uv, deltaR);
+            }
+
+            for (int x = left > 0 ? left : 0; x < right; x++)
+            {
+                float deltaZ = ((float)x - left)/((float)right - left);
+                float z = zLeft.Lerp(zRight, deltaZ);
+
+                Color4 color;
+                if (left1.Uv != Vector2.Zero)
+                {
+                    // texture
+                    var uV = uStart.Lerp(uEnd, deltaZ);
+                    uV.Y = 1 - uV.Y;
+                    color = TextureMap(uV);
+                }
+                else
+                {
+                    color = Color;
+                }
+
+                DrawHelper.PutPixel(Owner.Engine.WorkingTexture, x, y, z, color);
             }
         }
 
+        private void DrawTriangleScanLines(Vertex3 point1, Vertex3 point2, Vertex3 point3)
+        {
+            var p1 = point1;
+            var p2 = point2;
+            var p3 = point3;
+            if (p1.Y > p2.Y)
+            {
+                var t = p1;
+                p1 = p2;
+                p2 = t;
+            }
+            if (p2.Y > p3.Y)
+            {
+                var t = p2;
+                p2 = p3;
+                p3 = t;
+            }
+            if (p1.Y > p2.Y)
+            {
+                var t = p1;
+                p1 = p2;
+                p2 = t;
+            }
+
+            // inversed slope = dX / dY
+            float slopeP1P2 = (p2.X - p1.X) / (p2.Y - p1.Y);
+            float slopeP1P3 = (p3.X - p1.X) / (p3.Y - p1.Y);
+            if (slopeP1P3 > slopeP1P2) // p2 left
+            {
+                for (int y = (int) p1.Y; y <= (int) p3.Y; y++)
+                {
+                    if (y < p2.Y) // first part
+                    {
+                        DrawScanline(y, p1, p2, p1, p3);
+                    } else // second part
+                    {
+                        DrawScanline(y, p2, p3, p1, p3);
+                    }
+                }
+            }
+            else // p2 right
+            {
+                for (int y = (int)p1.Y; y <= (int)p3.Y; y++)
+                {
+                    if (y < p2.Y) // first part
+                    {
+                        DrawScanline(y, p1, p3, p1, p2);
+                    }
+                    else // second part
+                    {
+                        DrawScanline(y, p1, p3, p2, p3);
+                    }
+                }
+            }
+
+        }
 
         public Triangle Clone()
         {

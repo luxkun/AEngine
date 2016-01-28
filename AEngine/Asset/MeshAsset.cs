@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using OpenTK;
+using System.Numerics;
 
 namespace AEngine
 {
@@ -28,7 +28,7 @@ namespace AEngine
                     vertexList.Add(new Vector3(
                         float.Parse(items[1], CultureInfo.InvariantCulture),
                         float.Parse(items[2], CultureInfo.InvariantCulture),
-                        float.Parse(items[3], CultureInfo.InvariantCulture) * -1 // TODO: remove
+                        float.Parse(items[3], CultureInfo.InvariantCulture) - 1f
                         )
                         );
                 }
@@ -74,14 +74,13 @@ namespace AEngine
 
             foreach (var args in trianglesVertexList)
             {
+                var vertex1 = new Vertex3(vertexList[args[0]], UvList[args[3]]);
+                var vertex2 = new Vertex3(vertexList[args[1]], UvList[args[4]]);
+                var vertex3 = new Vertex3(vertexList[args[2]], UvList[args[5]]);
                 var triangle = new Triangle(
                     null,
-                    vertexList[args[0]],
-                    vertexList[args[1]],
-                    vertexList[args[2]] /*, 
-                    uvlist[args[3]],
-                    uvlist[args[4]],
-                    normalsList[args[5]],
+                    vertex1, vertex2, vertex3
+                    /*normalsList[args[5]],
                     normalsList[args[6]],
                     normalsList[args[7]]*/
                     );

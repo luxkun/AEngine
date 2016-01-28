@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Aiv.Fast2D;
-using OpenTK;
+using System.Numerics;
 using OpenTK.Graphics;
 
 namespace AEngine
@@ -12,6 +12,8 @@ namespace AEngine
     // replace everything with sprite rotations etc.
     public static class DrawHelper
     {
+        public static float[] ZBuffer;
+
         private static Dictionary<Color4, byte[]> cachedBackground;
         // black faster
 
@@ -34,15 +36,17 @@ namespace AEngine
             {
                 for (var bx = 0; bx < width; bx++)
                 {
-                    PutPixel(texture, bx + x, by + y, color);
+                    PutPixel(texture, bx + x, by + y, 0f, color);
                 }
             }
         }
 
-        public static void PutPixel(Texture texture, int x, int y, Color4 color)
+        public static void PutPixel(Texture texture, int x, int y, float z, Color4 color)
         {
-            if (x < 0 || y < 0 || x >= texture.Width || y >= texture.Height)
+            if (x < 0 || y < 0 || x >= texture.Width || y >= texture.Height || 
+                (ZBuffer[y * texture.Width + x] != 0f && ZBuffer[y * texture.Width + x] < z))
                 return;
+            ZBuffer[y*texture.Width + x] = z;
             var position = y * texture.Width * 4 + x * 4;
             if (position + 3 < texture.Bitmap.Length && position >= 0)
             {
@@ -53,7 +57,7 @@ namespace AEngine
             }
         }
 
-        public static void DrawLine(Texture texture, Vector2 from, Vector2 to, Color4 color)
+        public static void DrawLine(Texture texture, Vector3 from, Vector3 to, Color4 color)
         {
             var near = 300f;
             // not entirely correct but quite fast
@@ -87,7 +91,7 @@ namespace AEngine
             var numerator = longest >> 1;
             for (var i = 0; i <= longest && (x < texture.Width || y < texture.Height); i++)
             {
-                PutPixel(texture, x, y, color);
+                PutPixel(texture, x, y, 0f, color);
                 numerator += shortest;
                 if (!(numerator < longest))
                 {

@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using OpenTK;
+using Aiv.Fast2D;
+using System.Numerics;
 using OpenTK.Graphics;
 
 namespace AEngine
@@ -27,6 +28,7 @@ namespace AEngine
         }
 
         public virtual Color4 Color { get; set; }
+        public Texture Texture { get; set; }
 
         public override void Draw(Camera camera)
         {

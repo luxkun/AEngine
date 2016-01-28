@@ -1,27 +1,45 @@
 ﻿using System;
 using Aiv.Fast2D;
-using OpenTK;
+using System.Numerics;
 
 namespace AEngine
 {
     public static class VectorExtend
     {
-        public static Vector2 ToNdc(this Vector2 v, Engine engine)
+        public static float Lerp(this float min, float max, float delta)
         {
-            return new Vector2(v.X / engine.Width * 2 - 1, v.Y / engine.Height * 2 - 1);
+            return min + (max - min)*delta;
+        }
+        public static Vector2 Lerp(this Vector2 min, Vector2 max, float delta)
+        {
+            return new Vector2(min.X + (max.X - min.X) * delta, min.Y + (max.Y - min.Y) * delta);
         }
 
-        public static Vector2 FromNdc(this Vector2 v, Engine engine)
+        public static Vector3 Lerp(this Vector3 min, Vector3 max, float delta)
         {
-            return new Vector2((v.X + 1) / 2 * engine.Width, (v.Y + 1) / 2 * engine.Height);
+            return new Vector3(
+                min.X + (max.X - min.X) * delta,
+                min.Y + (max.Y - min.Y) * delta,
+                min.Z + (max.Z - min.Z) * delta);
+        }
+
+        //LERP min + (max - min) * delta
+        public static Vector3 ToNdc(this Vector3 v, Engine engine)
+        {
+            return new Vector3(v.X / engine.Width * 2 - 1, v.Y / engine.Height * 2 - 1, v.Z);
+        }
+
+        public static Vector3 FromNdc(this Vector3 v, Engine engine)
+        {
+            return new Vector3((v.X + 1) / 2 * engine.Width, (v.Y + 1) / 2 * engine.Height, v.Z);
         }
 
         public static Vector3 RotateY(this Vector3 v, float radian)
         {
             return new Vector3(
-                (float)(Math.Cos(radian) * v.X - Math.Sin(radian) * v.Z),
+                (float)(Math.Cos(radian) * v.X + Math.Sin(radian) * v.Z),
                 v.Y,
-                (float)(Math.Sin(radian) * v.X + Math.Cos(radian) * v.Z)
+                (float)(-Math.Sin(radian) * v.X + Math.Cos(radian) * v.Z)
                 );
         }
 
@@ -54,14 +72,14 @@ namespace AEngine
             return v;
         }
 
-        public static Vector2 Project(this Vector3 v, Engine engine, Camera camera)
+        public static Vector3 Project(this Vector3 v, Engine engine, Camera camera)
         {
             float vY, vX;
-            if (camera.Type == Camera.ProjectionType.Prospective)
+            if (camera.Type == Camera.ProjectionType.Prespective)
             {
                 // double
-                var aratio = engine.Width/engine.Height;
-                var rad = camera.Fov/2*(Math.PI/180); // angles to radians
+                var aratio = (double)engine.Width/engine.Height;
+                var rad = camera.Fov/2.0*(Math.PI/180.0); // angles to radians
                 var tan = Math.Tan(rad);
                 // float
                 vY = (float) (v.Y/(tan*v.Z));
@@ -72,7 +90,7 @@ namespace AEngine
                 vY = v.Y/v.Z;
                 vX = v.X/v.Z;
             }
-            return new Vector2(vX, vY);
+            return new Vector3(vX, vY, v.Z);
         }
     }
 }

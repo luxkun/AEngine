@@ -1,6 +1,7 @@
-﻿using OpenTK;
+﻿using System;
+using System.Numerics;
 
-namespace AEngine.Shapes
+namespace AEngine.Shape
 {
     public class Cuboid : Mesh
     {
@@ -35,37 +36,75 @@ namespace AEngine.Shapes
             //)
         }
 
+        // from: http://www.opentk.com/node/869
+        public Vector2 MinimumTranslation2D(Cuboid other)
+        {
+            Vector3 amin = this.Min;
+            Vector3 amax = this.Max;
+            Vector3 bmin = other.Min;
+            Vector3 bmax = other.Max;
+
+            Vector2 mtd = new Vector2();
+
+            float left = (bmin.X - amax.X);
+            float right = (bmax.X - amin.X);
+            float top = (bmin.Y - amax.Y);
+            float bottom = (bmax.Y - amin.Y);
+
+            // box dont intersect   
+            if (left > 0 || right < 0) return Vector2.Zero;
+            if (top > 0 || bottom < 0) return Vector2.Zero;
+
+            // box intersect. work out the mtd on both x and y axes.
+            if (Math.Abs(left) < right)
+                mtd.X = left;
+            else
+                mtd.X = right;
+
+            if (Math.Abs(top) < bottom)
+                mtd.Y = top;
+            else
+                mtd.Y = bottom;
+
+            // 0 the axis with the largest mtd value.
+            if (Math.Abs(mtd.X) < Math.Abs(mtd.Y))
+                mtd.Y = 0;
+            else
+                mtd.X = 0;
+            return mtd;
+        }
+
         private void CreateTriangles()
         {
             // face 1
-            var a = new Vector3(Min.X, Min.Y, Min.Z);
-            var b = new Vector3(Max.X, Min.Y, Min.Z);
-            var c = new Vector3(Min.X, Max.Y, Min.Z);
-            var d = new Vector3(Max.X, Max.Y, Min.Z);
+            var a = new Vertex3(new Vector3(Min.X, Min.Y, Min.Z));
+            var b = new Vertex3(new Vector3(Max.X, Min.Y, Min.Z));
+            var c = new Vertex3(new Vector3(Min.X, Max.Y, Min.Z));
+            var d = new Vertex3(new Vector3(Max.X, Max.Y, Min.Z));
             TriangleList.Add(new Triangle(this, a, b, d));
             TriangleList.Add(new Triangle(this, a, d, c));
 
             // lateral 1
-            a = new Vector3(Min.X, Min.Y, Min.Z);
-            b = new Vector3(Min.X, Min.Y, Max.Z);
-            c = new Vector3(Min.X, Max.Y, Min.Z);
-            d = new Vector3(Min.X, Max.Y, Max.Z);
+            a = new Vertex3(new Vector3(Min.X, Min.Y, Min.Z));
+            b = new Vertex3(new Vector3(Min.X, Min.Y, Max.Z));
+            c = new Vertex3(new Vector3(Min.X, Max.Y, Min.Z));
+            d = new Vertex3(new Vector3(Min.X, Max.Y, Max.Z));
             TriangleList.Add(new Triangle(this, a, b, d));
             TriangleList.Add(new Triangle(this, a, d, c));
 
             // lateral 2
-            a = new Vector3(Max.X, Min.Y, Min.Z);
-            b = new Vector3(Max.X, Min.Y, Max.Z);
-            c = new Vector3(Max.X, Max.Y, Min.Z);
-            d = new Vector3(Max.X, Max.Y, Max.Z);
+            a = new Vertex3(new Vector3(Max.X, Min.Y, Min.Z));
+            b = new Vertex3(new Vector3(Max.X, Min.Y, Max.Z));
+            c = new Vertex3(new Vector3(Max.X, Max.Y, Min.Z));
+            d = new Vertex3(new Vector3(Max.X, Max.Y, Max.Z));
             TriangleList.Add(new Triangle(this, a, b, d));
             TriangleList.Add(new Triangle(this, a, d, c));
 
             // face 2
-            a = new Vector3(Min.X, Min.Y, Max.Z);
-            b = new Vector3(Max.X, Min.Y, Max.Z);
-            c = new Vector3(Min.X, Max.Y, Max.Z);
-            d = new Vector3(Max.X, Max.Y, Max.Z);
+            a = new Vertex3(new Vector3(Min.X, Min.Y, Max.Z));
+            b = new Vertex3(new Vector3(Max.X, Min.Y, Max.Z));
+            c = new Vertex3(new Vector3(Min.X, Max.Y, Max.Z));
+            d = new Vertex3(new Vector3(Max.X, Max.Y, Max.Z));
             TriangleList.Add(new Triangle(this, a, b, d));
             TriangleList.Add(new Triangle(this, a, d, c));
         }

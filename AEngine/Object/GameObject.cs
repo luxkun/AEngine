@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AEngine;
-using AEngine.Shapes;
 using Aiv.Fast2D;
 using Aiv.Vorbis;
-using OpenTK;
+using System.Numerics;
+using AEngine.Shape;
 using OpenTK.Graphics;
 
 namespace AEngine
@@ -190,8 +191,22 @@ namespace AEngine
             OnDestroy?.Invoke(this);
             Enabled = false;
 
-            AudioSource.Dispose();
+            RemoveAllHitBoxes();
+            audioSource?.Dispose();
             Engine?.RemoveObject(this);
+        }
+
+        public void RemoveAllHitBoxes()
+        {
+            if (HitBoxes != null)
+                foreach (var hitBox in HitBoxes.Keys.ToArray())
+                    RemoveHitBox(hitBox);
+        }
+
+        public void RemoveHitBox(string hitBoxName)
+        {
+            HitBoxes[hitBoxName].Destroy();
+            HitBoxes.Remove(hitBoxName);
         }
 
         public virtual void Draw(Camera camera)
@@ -254,6 +269,9 @@ namespace AEngine
 
         public class Collision
         {
+            private Vector2 minimumTranslation2D;
+            private bool calculatedMT2D;
+
             public Collision(HitBox hitBox, GameObject other, HitBox otherHitBox)
             {
                 HitBox = hitBox;
@@ -261,9 +279,22 @@ namespace AEngine
                 OtherHitBox = otherHitBox;
             }
 
-            public HitBox HitBox { get; private set; }
+            public HitBox HitBox { get; }
             public GameObject Other { get; private set; }
-            public HitBox OtherHitBox { get; private set; }
+            public HitBox OtherHitBox { get; }
+
+            public Vector2 MinimumTranslation2D
+            {
+                get
+                {
+                    if (!calculatedMT2D)
+                    {
+                        calculatedMT2D = true;
+                        minimumTranslation2D = HitBox.MinimumTranslation2D(OtherHitBox);
+                    }
+                    return minimumTranslation2D;
+                }
+            }
         }
     }
 
